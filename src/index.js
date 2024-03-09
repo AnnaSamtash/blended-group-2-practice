@@ -20,6 +20,7 @@ const listOfNotes = document.querySelector('.tasks-list');
 const STORAGE_KEY = "notes";
 
 form.addEventListener('submit', handlerSubmit);
+listOfNotes.addEventListener('click', handlerClick);
 
 function handlerSubmit(event) {
     event.preventDefault();
@@ -31,11 +32,11 @@ function handlerSubmit(event) {
         return;
     }
     const arrayData = JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
-    const taskObj = { nameTask, textTask, id : Date.now() };
+    const taskObj = { nameTask, textTask, id: Date.now() };
     arrayData.push(taskObj);
     const jsn = JSON.stringify(arrayData);
     localStorage.setItem(STORAGE_KEY, jsn);
-    event.currentTarget.reset();  
+    event.currentTarget.reset();
     addToList();
 }
 
@@ -46,10 +47,23 @@ addToList();
 function addToList() {
     const arrayFromLocalStorage = JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
     const markup = arrayFromLocalStorage.map(({ nameTask, textTask, id }) => `<li class="task-list-item" data-id="${id}" >
-      <button class="task-list-item-btn">Видалити</button>
+      <button type="button" class="task-list-item-btn">Видалити</button>
       <h3>${nameTask}</h3>
       <p>${textTask}</p>
   </li>`
     ).join("");
     listOfNotes.innerHTML = markup;
 }
+
+function handlerClick(event) {
+    if (event.target.nodeName !== "BUTTON") {
+        return;
+    }
+    const item = event.target.closest("[ data-id ]")
+    const id = item.dataset.id;
+    const arrayFromLocalStorage = JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
+    const newArray = arrayFromLocalStorage.filter((item) => item.id !== Number(id));
+    const jsn = JSON.stringify(newArray);
+    localStorage.setItem(STORAGE_KEY, jsn);
+    addToList();
+};
